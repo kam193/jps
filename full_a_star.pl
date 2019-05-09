@@ -24,11 +24,27 @@ continue(Node, RestQueue, ClosedSet, Path) :-
     insert_new_nodes(NewNodes, RestQueue, NewQueue),
     search_A_star(NewQueue, [Node|ClosedSet], Path).
 
+% select up to N first elements from given list
+% select_elements(N, Queue, CurrentSelected, SelectedList).
+select_elements(N, _, N, []) :-
+    !.
+
+select_elements(_, [], _, []) :-
+    !.
+
+select_elements(N, [F|RestQueue], CurrentSelect, [F|RestSelectedList]) :-
+    NextSelect is CurrentSelect+1,
+    select_elements(N, RestQueue, NextSelect, RestSelectedList).
 
 fetch(node(State, Action, Parent, Cost, Score), [node(State, Action, Parent, Cost, Score)|RestQueue], ClosedSet, RestQueue) :-
     \+ member(node(State, _, _, _, _),
               ClosedSet),
+    select_elements(2,[node(State, Action, Parent, Cost, Score)|RestQueue], 0, Selected),
+    write("Slected N elemets: "),
+    write(Selected),
+    nl,
     !.
+
 fetch(Node, [_|RestQueue], ClosedSet, NewRest) :-
     fetch(Node, RestQueue, ClosedSet, NewRest).
 
