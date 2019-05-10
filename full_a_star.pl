@@ -1,5 +1,6 @@
 % Load state space from file (no error from linter)
 :- ensure_loaded(state_space). 
+:- ensure_loaded(e1_fetch_utils).
 
 
 start_A_star(InitState, PathCost) :-
@@ -23,33 +24,6 @@ continue(Node, RestQueue, ClosedSet, Path) :-
     expand(Node, NewNodes),
     insert_new_nodes(NewNodes, RestQueue, NewQueue),
     search_A_star(NewQueue, [Node|ClosedSet], Path).
-
-% select up to N first elements from given list
-% select_elements(N, Queue, CurrentSelected, SelectedList).
-select_elements(N, _, N, []) :-
-    !.
-
-select_elements(_, [], _, []) :-
-    !.
-
-select_elements(N, [F|RestQueue], CurrentSelect, [F|RestSelectedList]) :-
-    NextSelect is CurrentSelect+1,
-    select_elements(N, RestQueue, NextSelect, RestSelectedList).
-
-% read list of N elements from user
-% read_list(Size, CurrentStep, OutList)
-read_list(Size, Size, []) :-
-    !.
-
-read_list(Size, CurrentStep, [UserInput|Rest]) :-
-    NextStep is CurrentStep+1,
-    write("Input element "),
-    write(NextStep),
-    write(" of "),
-    write(Size),
-    write(": "),
-    read(UserInput),
-    read_list(Size, NextStep, Rest).
 
 
 fetch(node(State, Action, Parent, Cost, Score), [node(State, Action, Parent, Cost, Score)|RestQueue], ClosedSet, RestQueue) :-
