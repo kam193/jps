@@ -29,3 +29,10 @@ read_list(Size, CurrentStep, [UserInput|Rest]) :-
 % get_element(List, OutElement).
 get_element([Element|_], Element).
 get_element([_|Rest], Element) :- get_element(Rest, Element).
+
+% get I-th element from list
+% get(I, List, Current, Out)
+get(I, [Out|_], I, Out).
+get(I, [_|Rest], Current, Out) :-
+    Next is Current + 1,
+    get(I, Rest, Next, Out).
