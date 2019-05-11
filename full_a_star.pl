@@ -26,6 +26,22 @@ continue(Node, RestQueue, ClosedSet, Path) :-
     search_A_star(NewQueue, [Node|ClosedSet], Path).
 
 
+% ost element -> lista wyboru
+fetch(Node, Queue, _, _, []) :-
+    select_elements(2, Queue, 0, Selected),
+    write("Slected N elemets: "),
+    write(Selected),
+    nl,
+    read_list(3, 0, UserList),
+    infetch(Node, Queue, UserList),
+    !.
+
+infetch(Node, Queue, [X|_]) :-
+    get(X, Queue, 1, Node).
+
+infetch(Node, Queue, [_|RestIndexes]) :-
+    infetch(Node, Queue, RestIndexes).
+
 fetch(node(State, Action, Parent, Cost, Score), [node(State, Action, Parent, Cost, Score)|RestQueue], ClosedSet, RestQueue) :-
     \+ member(node(State, _, _, _, _),
               ClosedSet),
