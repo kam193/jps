@@ -5,14 +5,22 @@
 
 start_A_star(InitState, PathCost) :-
     score(InitState, 0, 0, InitCost, InitScore),
-    search_A_star([node(InitState, nil, nil, InitCost, InitScore)], [], PathCost).
+    search_A_star([node(InitState, nil, nil, InitCost, InitScore)],
+                  [],
+                  PathCost,
+                  0).
 
-search_A_star(Queue, ClosedSet, PathCost) :-
-    fetch(Node, Queue, ClosedSet, RestQueue),
-    continue(Node, RestQueue, ClosedSet, PathCost).
-
-
-continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cost)) :-
+                
+search_A_star(Queue, ClosedSet, PathCost, Step) :-
+    \+ Step is 4,
+    NextStep is Step+1,
+    fetch(Node, Queue, ClosedSet, RestQueue, NextStep),
+    continue(Node, RestQueue, ClosedSet, PathCost, NextStep).
+                
+% search_A_star(_, _, _, Step) :-
+%     Step is 2,
+%     !.
+continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cost), _) :-
     goal(State),
     !,
     build_path(node(Parent, _, _, _, _),
@@ -20,50 +28,62 @@ continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cos
                [Action/State],
                Path).
 
-continue(Node, RestQueue, ClosedSet, Path) :-
+continue(Node, RestQueue, ClosedSet, Path, Step) :-
     expand(Node, NewNodes),
     insert_new_nodes(NewNodes, RestQueue, NewQueue),
-    search_A_star(NewQueue, [Node|ClosedSet], Path).
+    search_A_star(NewQueue, [Node|ClosedSet], Path, Step).
 
+% fetch(_, _, _, _, Step) :-
+%     Step is 2,
+%     !.
 
-% ost element -> lista wyboru
-fetch(Node, Queue, _, _, []) :-
-    select_elements(2, Queue, 0, Selected),
+% wywalilem RestQueue - nie wiem, czy to dobrze
+fetch(Node, Queue, ClosedSet, Queue, Step) :-
+    write("Step is "),
+    write(Step),
+    nl,
+    select_elements(3, Queue, ClosedSet, 0, Selected),
     write("Slected N elemets: "),
     write(Selected),
     nl,
     read_list(3, 0, UserList),
-    infetch(Node, Queue, UserList),
+    infetch(Node, Selected, UserList, 3, 0).
+
+infetch(_, _, _, Max, Max) :-
     !.
 
-infetch(Node, Queue, [X|_]) :-
-    get(X, Queue, 1, Node).
+infetch(Node, Queue, Order, _, CurrentIndex) :-
+    get(CurrentIndex, Order, 1, NodeIndex),
+    get(NodeIndex, Queue, 1, Node),
+    write(Node),
+    write(" "),
+    write(CurrentIndex),
+    nl.
 
-infetch(Node, Queue, [_|RestIndexes]) :-
-    infetch(Node, Queue, RestIndexes).
+infetch(Node, Queue, Order, Max, CurrentIndex) :-
+    NextIndex is CurrentIndex+1,
+    infetch(Node, Queue, Order, Max, NextIndex).
 
-fetch(node(State, Action, Parent, Cost, Score), [node(State, Action, Parent, Cost, Score)|RestQueue], ClosedSet, RestQueue) :-
-    \+ member(node(State, _, _, _, _),
-              ClosedSet),
-    select_elements(2,
+% fetch(node(State, Action, Parent, Cost, Score), [node(State, Action, Parent, Cost, Score)|RestQueue], ClosedSet, RestQueue) :-
+%     \+ member(node(State, _, _, _, _),
+%               ClosedSet),
+%     select_elements(2,
                     
-                    [ node(State, Action, Parent, Cost, Score)
-                    | RestQueue
-                    ],
-                    0,
-                    Selected),
-    write("Slected N elemets: "),
-    write(Selected),
-    nl,
-    read_list(3, 0, UserList),
-    write(UserList),
-    nl,
-    !.
+%                     [ node(State, Action, Parent, Cost, Score)
+%                     | RestQueue
+%                     ],
+%                     0,
+%                     Selected),
+%     write("Slected N elemets: "),
+%     write(Selected),
+%     nl,
+%     read_list(3, 0, UserList),
+%     write(UserList),
+%     nl,
+%     !.
 
-fetch(Node, [_|RestQueue], ClosedSet, NewRest) :-
-    fetch(Node, RestQueue, ClosedSet, NewRest).
-
-
+% fetch(Node, [_|RestQueue], ClosedSet, NewRest) :-
+%     fetch(Node, RestQueue, ClosedSet, NewRest).
 expand(node(State, _, _, Cost, _), NewNodes) :-
     findall(node(ChildState, Action, State, NewCost, ChildScore),
             ( succ(State, Action, StepCost, ChildState),
