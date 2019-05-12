@@ -25,8 +25,9 @@ search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
     read_element(NewLimit, "Steps=Limit, write new limit or '0' if you want to stop."),
     search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences, NewLimit).
 
-search_A_star(Queue, ClosedSet, PathCost, Step, _ , Preferences, NewLimit) :-
+search_A_star(Queue, ClosedSet, PathCost, Step, Limit , Preferences, NewLimit) :-
     \+ NewLimit is 0,
+    NewLimit > Limit, % check if new limit is greater than current
     search_A_star(Queue, ClosedSet, PathCost, Step, NewLimit, Preferences).
 
 continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cost), _, _, _) :-
@@ -49,11 +50,19 @@ fetch(Node, Queue, ClosedSet, Queue, Step, Limit, Preferences) :-
     write(" / Limit is "),
     write(Limit),
     nl,
-    select_elements(Preferences, Queue, ClosedSet, 0, Selected),
+    
+    len(Queue, QueueLength),
+    minimum(QueueLength, Preferences, Minimum),
+
+    nl,
+    write("QL: " + QueueLength + " PR: " + Preferences + "MIN" + Minimum),
+    nl,
+
+    select_elements(Minimum, Queue, ClosedSet, 0, Selected),
     write("Selected N elemets: "),
     write(Selected),
     nl,
-    read_list(Preferences, 0, UserList),
+    read_list(Minimum, 0, UserList),
     nl,
     infetch(Node, Selected, UserList, Preferences, 0).
 
@@ -143,3 +152,15 @@ del([X|R], X, R).
 del([Y|R], X, [Y|R1]) :-
     X\=Y,
     del(R, X, R1).
+
+len([], LenResult):-
+    LenResult is 0.
+
+len([X|Y], LenResult):-
+    len(Y, L),
+    LenResult is L + 1.
+
+minimum(A, B, A):-
+    A < B.
+minimum(A, B, B):-
+    \+ A < B.
