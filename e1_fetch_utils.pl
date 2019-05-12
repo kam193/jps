@@ -32,6 +32,10 @@ read_list(Size, CurrentStep, [UserInput|Rest]) :-
     read(UserInput),
     read_list(Size, NextStep, Rest).
 
+read_element(Result, Text) :-
+    write(Text),
+    read(Result).
+
 % get all elements from list one by one
 % get_element(List, OutElement).
 get_element([Element|_], Element).

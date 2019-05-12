@@ -5,22 +5,25 @@
 
 start_A_star(InitState, PathCost) :-
     score(InitState, 0, 0, InitCost, InitScore),
+    read_element(Limit, "Steps limit: "),
+    read_element(Preferences, "Preferences list size: "),
+
     search_A_star([node(InitState, nil, nil, InitCost, InitScore)],
                   [],
                   PathCost,
-                  0).
+                  0, Limit, Preferences).
 
                 
-search_A_star(Queue, ClosedSet, PathCost, Step) :-
-    \+ Step is 4,
+search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
+    \+ Step is Limit,
     NextStep is Step+1,
-    fetch(Node, Queue, ClosedSet, RestQueue, NextStep),
-    continue(Node, RestQueue, ClosedSet, PathCost, NextStep).
+    fetch(Node, Queue, ClosedSet, RestQueue, NextStep, Limit, Preferences),
+    continue(Node, RestQueue, ClosedSet, PathCost, NextStep, Limit, Preferences).
                 
 % search_A_star(_, _, _, Step) :-
 %     Step is 2,
 %     !.
-continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cost), _) :-
+continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cost), _, _, _) :-
     goal(State),
     !,
     build_path(node(Parent, _, _, _, _),
@@ -28,26 +31,28 @@ continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cos
                [Action/State],
                Path).
 
-continue(Node, RestQueue, ClosedSet, Path, Step) :-
+continue(Node, RestQueue, ClosedSet, Path, Step, Limit, Preferences) :-
     expand(Node, NewNodes),
     insert_new_nodes(NewNodes, RestQueue, NewQueue),
-    search_A_star(NewQueue, [Node|ClosedSet], Path, Step).
+    search_A_star(NewQueue, [Node|ClosedSet], Path, Step, Limit, Preferences).
 
 % fetch(_, _, _, _, Step) :-
 %     Step is 2,
 %     !.
 
 % wywalilem RestQueue - nie wiem, czy to dobrze
-fetch(Node, Queue, ClosedSet, Queue, Step) :-
+fetch(Node, Queue, ClosedSet, Queue, Step, Limit, Preferences) :-
     write("Step is "),
     write(Step),
+    write(" / Limit is "),
+    write(Limit),
     nl,
-    select_elements(3, Queue, ClosedSet, 0, Selected),
-    write("Slected N elemets: "),
+    select_elements(Preferences, Queue, ClosedSet, 0, Selected),
+    write("Selected N elemets: "),
     write(Selected),
     nl,
-    read_list(3, 0, UserList),
-    infetch(Node, Selected, UserList, 3, 0).
+    read_list(Preferences, 0, UserList),
+    infetch(Node, Selected, UserList, Preferences, 0).
 
 infetch(_, _, _, Max, Max) :-
     !.
