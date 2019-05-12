@@ -20,9 +20,15 @@ search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
     fetch(Node, Queue, ClosedSet, RestQueue, NextStep, Limit, Preferences),
     continue(Node, RestQueue, ClosedSet, PathCost, NextStep, Limit, Preferences).
                 
-% search_A_star(_, _, _, Step) :-
-%     Step is 2,
-%     !.
+search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
+    Step is Limit,
+    read_element(NewLimit, "Steps=Limit, write new limit or '0' if you want to stop."),
+    search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences, NewLimit).
+
+search_A_star(Queue, ClosedSet, PathCost, Step, _ , Preferences, NewLimit) :-
+    \+ NewLimit is 0,
+    search_A_star(Queue, ClosedSet, PathCost, Step, NewLimit, Preferences).
+
 continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cost), _, _, _) :-
     goal(State),
     !,
@@ -36,10 +42,6 @@ continue(Node, RestQueue, ClosedSet, Path, Step, Limit, Preferences) :-
     insert_new_nodes(NewNodes, RestQueue, NewQueue),
     search_A_star(NewQueue, [Node|ClosedSet], Path, Step, Limit, Preferences).
 
-% fetch(_, _, _, _, Step) :-
-%     Step is 2,
-%     !.
-
 % wywalilem RestQueue - nie wiem, czy to dobrze
 fetch(Node, Queue, ClosedSet, Queue, Step, Limit, Preferences) :-
     write("Step is "),
@@ -52,6 +54,7 @@ fetch(Node, Queue, ClosedSet, Queue, Step, Limit, Preferences) :-
     write(Selected),
     nl,
     read_list(Preferences, 0, UserList),
+    nl,
     infetch(Node, Selected, UserList, Preferences, 0).
 
 infetch(_, _, _, Max, Max) :-
