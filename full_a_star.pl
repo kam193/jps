@@ -7,27 +7,47 @@ start_A_star(InitState, PathCost) :-
     score(InitState, 0, 0, InitCost, InitScore),
     read_element(Limit, "Steps limit: "),
     read_element(Preferences, "Preferences list size: "),
-
     search_A_star([node(InitState, nil, nil, InitCost, InitScore)],
                   [],
                   PathCost,
-                  0, Limit, Preferences).
+                  0,
+                  Limit,
+                  Preferences).
 
                 
 search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
-    \+ Step is Limit,
+    Step<Limit,
     NextStep is Step+1,
-    fetch(Node, Queue, ClosedSet, RestQueue, NextStep, Limit, Preferences),
-    continue(Node, RestQueue, ClosedSet, PathCost, NextStep, Limit, Preferences).
+    fetch(Node,
+          Queue,
+          ClosedSet,
+          RestQueue,
+          NextStep,
+          Limit,
+          Preferences),
+    continue(Node,
+             RestQueue,
+             ClosedSet,
+             PathCost,
+             NextStep,
+             Limit,
+             Preferences).
                 
 search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
     Step is Limit,
-    read_element(NewLimit, "Steps=Limit, write new limit or '0' if you want to stop."),
-    search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences, NewLimit).
+    read_element(NewLimit,
+                 "Steps=Limit, write new limit or '0' if you want to stop."),
+    search_A_star(Queue,
+                  ClosedSet,
+                  PathCost,
+                  Step,
+                  Limit,
+                  Preferences,
+                  NewLimit).
 
-search_A_star(Queue, ClosedSet, PathCost, Step, Limit , Preferences, NewLimit) :-
+search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences, NewLimit) :-
     \+ NewLimit is 0,
-    NewLimit > Limit, % check if new limit is greater than current
+    NewLimit>Limit, % check if new limit is greater than current
     search_A_star(Queue, ClosedSet, PathCost, Step, NewLimit, Preferences).
 
 continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cost), _, _, _) :-
@@ -41,40 +61,37 @@ continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cos
 continue(Node, RestQueue, ClosedSet, Path, Step, Limit, Preferences) :-
     expand(Node, NewNodes),
     insert_new_nodes(NewNodes, RestQueue, NewQueue),
-    search_A_star(NewQueue, [Node|ClosedSet], Path, Step, Limit, Preferences).
+    search_A_star(NewQueue,
+                  [Node|ClosedSet],
+                  Path,
+                  Step,
+                  Limit,
+                  Preferences).
 
-% wywalilem RestQueue - nie wiem, czy to dobrze
 fetch(Node, Queue, ClosedSet, Queue, Step, Limit, Preferences) :-
     write("Step is "),
     write(Step),
     write(" / Limit is "),
     write(Limit),
-
     nl,
-    write("QL: " + QueueLength + " PR: " + Preferences + "MIN" + Minimum),
-    nl,
-
     select_elements(Preferences, Queue, ClosedSet, 0, Selected),
     write("Selected N elemets: "),
     write(Selected),
-    
-    len(Queue, QueueLength),
-    minimum(Selected, Preferences, Minimum),
-
+    len(Selected, SelectedLength),
+    minimum(SelectedLength, Preferences, Minimum),
     nl,
     read_list(Minimum, 0, UserList),
     nl,
-    infetch(Node, Selected, UserList, Preferences, 0).
+    infetch(Node, Selected, UserList, Preferences, 1).
 
-infetch(_, _, _, Max, Max) :-
+infetch(_, _, _, Max, CurrentIndex) :-
+    CurrentIndex is Max+1,
     !.
 
 infetch(Node, Queue, Order, _, CurrentIndex) :-
     get(CurrentIndex, Order, 1, NodeIndex),
     get(NodeIndex, Queue, 1, Node),
-    write(Node),
-    write(" "),
-    write(CurrentIndex),
+    write("Current node: "+Node+" "+CurrentIndex),
     nl.
 
 infetch(Node, Queue, Order, Max, CurrentIndex) :-
