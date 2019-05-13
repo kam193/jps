@@ -17,6 +17,7 @@ start_A_star(InitState, PathCost) :-
                 
 search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
     Step<Limit,
+    !,
     NextStep is Step+1,
     fetch(Node,
           Queue,
@@ -36,19 +37,18 @@ search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
 search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
     Step is Limit,
     read_element(NewLimit,
-                 "Steps=Limit, write new limit or '0' if you want to stop."),
+                 "Steps=Limit, write limit higher of "+Limit+" if you want to continue."),
+    NewLimit>Limit, !,
     search_A_star(Queue,
                   ClosedSet,
                   PathCost,
                   Step,
-                  Limit,
-                  Preferences,
-                  NewLimit).
+                  NewLimit,
+                  Preferences).
 
-search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences, NewLimit) :-
-    \+ NewLimit is 0,
-    NewLimit>Limit, % check if new limit is greater than current
-    search_A_star(Queue, ClosedSet, PathCost, Step, NewLimit, Preferences).
+% search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences, NewLimit) :-
+%     NewLimit>Limit, % check if new limit is greater than current
+%     search_A_star(Queue, ClosedSet, PathCost, Step, NewLimit, Preferences).
 
 continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cost), _, _, _) :-
     goal(State),
@@ -91,7 +91,7 @@ infetch(_, _, _, Max, CurrentIndex) :-
 infetch(Node, Queue, Order, _, CurrentIndex) :-
     get(CurrentIndex, Order, 1, NodeIndex),
     get(NodeIndex, Queue, 1, Node),
-    write("Current node: "+Node+" "+CurrentIndex),
+    write("Current node: "+Node),
     nl.
 
 infetch(Node, Queue, Order, Max, CurrentIndex) :-
@@ -170,14 +170,14 @@ del([Y|R], X, [Y|R1]) :-
     X\=Y,
     del(R, X, R1).
 
-len([], LenResult):-
+len([], LenResult) :-
     LenResult is 0.
 
-len([X|Y], LenResult):-
+len([_|Y], LenResult) :-
     len(Y, L),
-    LenResult is L + 1.
+    LenResult is L+1.
 
-minimum(A, B, A):-
-    A < B.
-minimum(A, B, B):-
-    \+ A < B.
+minimum(A, B, A) :-
+    A<B.
+minimum(A, B, B) :-
+    \+ A<B.
