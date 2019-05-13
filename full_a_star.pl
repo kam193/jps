@@ -49,18 +49,18 @@ fetch(Node, Queue, ClosedSet, Queue, Step, Limit, Preferences) :-
     write(Step),
     write(" / Limit is "),
     write(Limit),
-    nl,
-    
-    len(Queue, QueueLength),
-    minimum(QueueLength, Preferences, Minimum),
 
     nl,
     write("QL: " + QueueLength + " PR: " + Preferences + "MIN" + Minimum),
     nl,
 
-    select_elements(Minimum, Queue, ClosedSet, 0, Selected),
+    select_elements(Preferences, Queue, ClosedSet, 0, Selected),
     write("Selected N elemets: "),
     write(Selected),
+    
+    len(Queue, QueueLength),
+    minimum(Selected, Preferences, Minimum),
+
     nl,
     read_list(Minimum, 0, UserList),
     nl,

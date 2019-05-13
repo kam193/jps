@@ -3,6 +3,6 @@
 
 % this executes A* after load this file to prolog
 start_up :-
-    forall(start_A_star(a, PathCost), (write(PathCost), nl)).
+    start_A_star(a, PathCost), (write(PathCost), nl).
 
 :- start_up.
