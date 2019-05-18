@@ -1,5 +1,5 @@
 % select up to N first elements from given list
-% ! -> maybe we need to select only not-used elements!
+
 % select_elements(N, Queue, ClosedSet, CurrentSelected, SelectedList).
 select_elements(N, _, _, N, []) :-
     !.

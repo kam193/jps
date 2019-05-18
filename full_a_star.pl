@@ -38,17 +38,9 @@ search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences) :-
     Step is Limit,
     read_element(NewLimit,
                  "Steps=Limit, write limit higher of "+Limit+" if you want to continue."),
-    NewLimit>Limit, !,
-    search_A_star(Queue,
-                  ClosedSet,
-                  PathCost,
-                  Step,
-                  NewLimit,
-                  Preferences).
-
-% search_A_star(Queue, ClosedSet, PathCost, Step, Limit, Preferences, NewLimit) :-
-%     NewLimit>Limit, % check if new limit is greater than current
-%     search_A_star(Queue, ClosedSet, PathCost, Step, NewLimit, Preferences).
+    NewLimit>Limit,
+    !,
+    search_A_star(Queue, ClosedSet, PathCost, Step, NewLimit, Preferences).
 
 continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path, Cost), _, _, _) :-
     goal(State),
@@ -98,26 +90,6 @@ infetch(Node, Queue, Order, Max, CurrentIndex) :-
     NextIndex is CurrentIndex+1,
     infetch(Node, Queue, Order, Max, NextIndex).
 
-% fetch(node(State, Action, Parent, Cost, Score), [node(State, Action, Parent, Cost, Score)|RestQueue], ClosedSet, RestQueue) :-
-%     \+ member(node(State, _, _, _, _),
-%               ClosedSet),
-%     select_elements(2,
-                    
-%                     [ node(State, Action, Parent, Cost, Score)
-%                     | RestQueue
-%                     ],
-%                     0,
-%                     Selected),
-%     write("Slected N elemets: "),
-%     write(Selected),
-%     nl,
-%     read_list(3, 0, UserList),
-%     write(UserList),
-%     nl,
-%     !.
-
-% fetch(Node, [_|RestQueue], ClosedSet, NewRest) :-
-%     fetch(Node, RestQueue, ClosedSet, NewRest).
 expand(node(State, _, _, Cost, _), NewNodes) :-
     findall(node(ChildState, Action, State, NewCost, ChildScore),
             ( succ(State, Action, StepCost, ChildState),
