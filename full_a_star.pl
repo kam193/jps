@@ -97,13 +97,11 @@ new_find(State, Cost, _) :-
     succ(State, Action, StepCost, ChildState),
     score(ChildState, Cost, StepCost, NewCost, ChildScore),
     assert(find_result(node(ChildState, Action, State, NewCost, ChildScore))),
-    nl,
     fail.
 
 new_find(_, _, AllResults) :-
     assert(find_result(sentinel)),
-    collect_results(AllResults),
-    nl.
+    collect_results(AllResults).
 
 collect_results(Rest) :-
     retract(find_result(Result)),
