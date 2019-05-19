@@ -91,12 +91,29 @@ infetch(Node, Queue, Order, Max, CurrentIndex) :-
     infetch(Node, Queue, Order, Max, NextIndex).
 
 expand(node(State, _, _, Cost, _), NewNodes) :-
-    findall(node(ChildState, Action, State, NewCost, ChildScore),
-            ( succ(State, Action, StepCost, ChildState),
-              score(ChildState, Cost, StepCost, NewCost, ChildScore)
-            ),
-            NewNodes).
+    new_find(State, Cost, NewNodes). 
 
+new_find(State, Cost, _) :-
+    succ(State, Action, StepCost, ChildState),
+    score(ChildState, Cost, StepCost, NewCost, ChildScore),
+    assert(find_result(node(ChildState, Action, State, NewCost, ChildScore))),
+    nl,
+    fail.
+
+new_find(_, _, AllResults) :-
+    assert(find_result(sentinel)),
+    collect_results(AllResults),
+    nl.
+
+collect_results(Rest) :-
+    retract(find_result(Result)),
+    !,
+    append_result(Result, Rest).
+
+append_result(sentinel, []).
+
+append_result(Result, [Result|Rest]) :-
+    collect_results(Rest).
 
 score(State, ParentCost, StepCost, Cost, FScore) :-
     Cost is ParentCost+StepCost,
