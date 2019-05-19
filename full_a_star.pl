@@ -1,5 +1,5 @@
 % Load state space from file (no error from linter)
-:- ensure_loaded(state_space). 
+:- ensure_loaded(table_space). 
 :- ensure_loaded(e1_fetch_utils).
 
 
