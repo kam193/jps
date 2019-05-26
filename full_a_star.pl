@@ -1,5 +1,5 @@
 % Load state space from file (no error from linter)
-:- ensure_loaded(state_space). 
+:- ensure_loaded(table_space). 
 :- ensure_loaded(e1_fetch_utils).
 
 
@@ -84,19 +84,35 @@ infetch(Node, Queue, Order, _, CurrentIndex) :-
     get(CurrentIndex, Order, 1, NodeIndex),
     get(NodeIndex, Queue, 1, Node),
     write("Current node: "+Node),
-    nl.
+    nl
+    .
 
 infetch(Node, Queue, Order, Max, CurrentIndex) :-
     NextIndex is CurrentIndex+1,
     infetch(Node, Queue, Order, Max, NextIndex).
 
 expand(node(State, _, _, Cost, _), NewNodes) :-
-    findall(node(ChildState, Action, State, NewCost, ChildScore),
-            ( succ(State, Action, StepCost, ChildState),
-              score(ChildState, Cost, StepCost, NewCost, ChildScore)
-            ),
-            NewNodes).
+    new_find(State, Cost, NewNodes). 
 
+new_find(State, Cost, _) :-
+    succ(State, Action, StepCost, ChildState),
+    score(ChildState, Cost, StepCost, NewCost, ChildScore),
+    assert(find_result(node(ChildState, Action, State, NewCost, ChildScore))),
+    fail.
+
+new_find(_, _, AllResults) :-
+    assert(find_result(sentinel)),
+    collect_results(AllResults).
+
+collect_results(Rest) :-
+    retract(find_result(Result)),
+    !,
+    append_result(Result, Rest).
+
+append_result(sentinel, []).
+
+append_result(Result, [Result|Rest]) :-
+    collect_results(Rest).
 
 score(State, ParentCost, StepCost, Cost, FScore) :-
     Cost is ParentCost+StepCost,
