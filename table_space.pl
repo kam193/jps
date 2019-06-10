@@ -52,21 +52,21 @@ hScore(State, HScore) :-
 
 hCount([], 0, []).
 
-hCount([pos(I, Poz)|Rest], HScore, [pos(I, Poz)|GRest]) :-
-    hCount(Rest, HScore, GRest), !.
+% hCount([pos(I, Poz)|Rest], HScore, [pos(I, Poz)|GRest]) :-
+%     hCount(Rest, HScore, GRest), !.
 
-hCount([pos(I, _)|Rest], HScore, [pos(I, _)|GRest]) :-
-    hCount(Rest, RestScore, GRest),
-    HScore is RestScore + 1.
+% hCount([pos(I, _)|Rest], HScore, [pos(I, _)|GRest]) :-
+%     hCount(Rest, RestScore, GRest),
+%     HScore is RestScore + 1.
 
 % Pierwsza heurystyka
-% hCount([pos(I, Column/Row)|Rest], HScore, [pos(I, GCol/GRow)|GRest]) :-
-%     ColumnDiff is Column-GCol,
-%     RowDiff is Row-GRow,
-%     my_abs(ColumnDiff, ColAbs),
-%     my_abs(RowDiff, RowAbs),
-%     hCount(Rest, RestScore, GRest),
-%     HScore is RestScore+RowAbs+ColAbs.
+hCount([pos(I, Column/Row)|Rest], HScore, [pos(I, GCol/GRow)|GRest]) :-
+    ColumnDiff is Column-GCol,
+    RowDiff is Row-GRow,
+    my_abs(ColumnDiff, ColAbs),
+    my_abs(RowDiff, RowAbs),
+    hCount(Rest, RestScore, GRest),
+    HScore is RestScore+RowAbs+ColAbs.
 
 my_abs(Val, Val) :-
     Val>=0,

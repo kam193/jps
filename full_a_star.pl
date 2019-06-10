@@ -72,9 +72,9 @@ fetch(Node, Queue, ClosedSet, Queue, Step, Limit, Preferences) :-
     len(Selected, SelectedLength),
     minimum(SelectedLength, Preferences, Minimum),
     nl,
-    read_list(Minimum, 0, UserList),
-    nl,
-    infetch(Node, Selected, UserList, Preferences, 1).
+    % read_list(Minimum, 0, UserList),
+    % nl,
+    infetch(Node, Selected, [1], Preferences, 1).
 
 infetch(_, _, _, Max, CurrentIndex) :-
     CurrentIndex is Max+1,
