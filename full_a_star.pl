@@ -61,6 +61,7 @@ continue(Node, RestQueue, ClosedSet, Path, Step, Limit, Preferences) :-
                   Preferences).
 
 fetch(Node, Queue, ClosedSet, Queue, Step, Limit, Preferences) :-
+    nl,
     write("Step is "),
     write(Step),
     write(" / Limit is "),
